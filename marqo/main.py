@@ -71,11 +71,12 @@ def create_csv() -> str:
         return "Error creating CSV"
     
 @app.post("/query_chroma/")
-def get_data(q: str) -> Dict:
+def get_data(q: str) -> List[Tuple[Document, float]]:
     try:
-     response = similarity_search_chroma(query=q,
-                                        collection_name='index1')
-     return response
+        response = similarity_search_chroma(query=q,
+                                            collection_name='index1',
+                                            k = 10)
+        return response
     except Exception as e:
        print(f'>>>> Error searching Chromadb {e}')
     return None

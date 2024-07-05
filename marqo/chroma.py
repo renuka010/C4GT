@@ -9,11 +9,16 @@ from typing import (
 )
 from langchain.docstore.document import Document
 from chromadb.utils import embedding_functions
+from langchain_chroma import Chroma
+from langchain_community.embeddings.sentence_transformer import (
+    SentenceTransformerEmbeddings,
+)
 
 load_dotenv()
 
 client = chromadb.HttpClient(host=os.environ["CHROMA_HOST"], port=os.environ["CHROMA_PORT"])
 embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-mpnet-base-v2")
+embedding_function = SentenceTransformerEmbeddings(model_name="all-mpnet-base-v2")
 
 # id generator for metadata
 def generate_id():
@@ -50,11 +55,17 @@ def add_documents_chroma(documents=List[Document], collection_name: str="index1"
         print(f'Error uploading documents to Chromdb {e}')
     return ids
 
-def similarity_search_chroma(query: str, collection_name: str, k: int = 20) -> Dict:
+def similarity_search_chroma(query: str, collection_name: str, k: int = 20) -> List[Tuple[Document, float]]:
     try:
-        collections = client.get_collection(collection_name,
-                                            embedding_function=embedding_func)
-        response = collections.query(query_texts=[query])
+        langchain_chroma = Chroma(client=client,
+                                  collection_name="index1",
+                                  embedding_function=embedding_function
+                                  )
+        response = langchain_chroma.similarity_search_with_score(query=query,
+                                                      k=k)
+        # collections = client.get_collection(collection_name,
+        #                                     embedding_function=embedding_func)
+        # response = collections.query(query_texts=[query])
         return response
     except Exception as e:
         print(f'>>>>> Error searching Chroma {e}')

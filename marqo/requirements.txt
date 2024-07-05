@@ -26,4 +26,6 @@ marqo==2.1.0
 redis>=5.0.1
 docx2txt
 yt_dlp
-chromadb 
+chromadb
+langchain-chroma
+langchain_community
