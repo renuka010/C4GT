@@ -1,3 +1,6 @@
 env
 .env
 input_data
+__pycache__
+.chroma
+.vscode
