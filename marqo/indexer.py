@@ -15,7 +15,7 @@ def document_loader(input_dir: str) -> List[Document]:
  
 def split_documents(documents: List[Document], chunk_size: int = 4000, chunk_overlap = 200) -> List[Document]:
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        chunk_size=chunk_size, chunk_overlap=chunk_overlap, separators=["."])
     # splited_docs = text_splitter.split_documents(documents)
     splited_docs = []
     pattern = re.compile(r'[\x00-\x1F\x7F\u00A0]')
@@ -23,10 +23,7 @@ def split_documents(documents: List[Document], chunk_size: int = 4000, chunk_ove
         for chunk in text_splitter.split_text(document.text):
             chunk = re.sub(pattern, '', chunk)
             splited_docs.append(Document(page_content=chunk, metadata={
-                "page_label": document.metadata.get("page_label"),
-                "file_name": document.metadata.get("file_name"),
-                # "file_path": document.metadata.get("file_path"),
-                "file_type": document.metadata.get("file_type")
+                "subject":"physics"
             }))
     return splited_docs
 
@@ -38,13 +35,13 @@ def load_documents(folder_path: str, chunk_size: int, chunk_overlap: int) -> Lis
     splitted_documents = split_documents(documents, chunk_size, chunk_overlap)
     return splitted_documents
 
-def indexer_main():
+def indexer_marqo():
     parser = argparse.ArgumentParser()
     parser.add_argument('--folder_path',
                         type=str,
                         required=False,
                         help='Path to the folder',
-                        default="input_data/XI_books/XI_Physics_Part1"
+                        default="input_data/XI_books/XI_Physics_Part2"
                         )
     # parser.add_argument('--index_name',
     #                     type=str,
@@ -60,7 +57,7 @@ def indexer_main():
     args = parser.parse_args()
 
     FOLDER_PATH = args.folder_path
-    COLLECTION_NAMES = ["index8"]
+    COLLECTION_NAMES = ["passcurr_split"]
     FRESH_INDEX = args.fresh_index
     CHUNK_SIZE = 1024
     CHUNK_OVERLAP = 200
@@ -83,7 +80,7 @@ def indexer_chroma():
                         type=str,
                         required=False,
                         help='Path to the folder',
-                        default="input_data/XI_books/XI_Physics_Part1"
+                        default="input_data/XI_books/XI_Physics_Part2"
                         )
     # parser.add_argument('--index_name',
     #                     type=str,
@@ -116,11 +113,12 @@ def indexer_chroma():
         print(f"============ INDEX {COLLECTION_NAME} DONE =============")
         q= "What is projectile motion?"
         print(f'Query: {q}')
-        similarity_search_chroma(query=q,collection_name='index1')
+        similarity_search_chroma(query=q,collection_name='index10',k = 10)
         
 
+        
 if __name__ == "__main__":
-    indexer_chroma()
+    indexer_marqo()
     
 # For Fresh collection
 # python3 indexer.py --folder_path=input_data/XI_books --index_name=index1 --fresh_index

@@ -20,19 +20,21 @@ BATCH_SIZE: int = 50
 TENSOR_FIELDS: str = ["text"]
 client_url = os.environ["VECTOR_STORE_ENDPOINT"]
 client: marqo.Client = marqo.Client(url=client_url)
-embedding_models: Dict = {
+embedding_models: Dict = {    
+    "sent_split": "sentence-transformers/all-mpnet-base-v2",
+    "char_split": "sentence-transformers/all-mpnet-base-v2",
+    "passage_split": "sentence-transformers/all-mpnet-base-v2",
+    "passcurr_split" : "sentence-transformers/all-mpnet-base-v2",
+
     "index1" : "sentence-transformers/all-MiniLM-L6-v2", #384
     "index2" : "sentence-transformers/all-mpnet-base-v2",  #768
-    # "index3" : "sentence-transformers/stsb-xlm-r-multilingual", #approx 30 to 35sec per batch
     "index4" : "flax-sentence-embeddings/all_datasets_v3_MiniLM-L6", #384
     "index5" : "flax-sentence-embeddings/all_datasets_v4_MiniLM-L6", #384
     "index6" : "flax-sentence-embeddings/all_datasets_v3_mpnet-base", #768
     "index7" : "flax-sentence-embeddings/all_datasets_v4_mpnet-base", #768
     "index8" : "flax-sentence-embeddings/all_datasets_v4_mpnet-base",
-    # "index7" : "hf/bge-large-en-v1.5",
-    # "index8" : "hf/bge-large-zh-v1.5",
-    # "index9" : "hf/GIST-large-Embedding-v0",
-    "index9" : "hf/e5-large-v2", #1024
+    "index9" : "sentence-transformers/all-mpnet-base-v2",
+    "index10" : "sentence-transformers/all-mpnet-base-v2",
 }
 
 def chunk_list(document: List, batch_size: int) -> List[List]:
@@ -53,7 +55,7 @@ def add_documents(documents=List[Document], collection_name: str="index1", fresh
             "textPreprocessing": {
                 "splitLength": SPLIT_LENGTH,
                 "splitOverlap": SPLIT_OVERLAP,
-                "splitMethod": "sentence"
+                "splitMethod": "passage"
             }
         }
         client.create_index(

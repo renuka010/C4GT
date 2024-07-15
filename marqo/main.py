@@ -43,10 +43,11 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.post("/query_marqo/")
-def get_data(q: str) -> List[Tuple[Document, float]]:
+def get_data(q: str, index: str) -> List[Tuple[Document, float]]:
     try:
      response = similarity_search_with_score(query=q,
-                                        collection_name='index2')
+                                        collection_name=index,
+                                        k=10)
      return response
     except Exception as e:
        print(e)
